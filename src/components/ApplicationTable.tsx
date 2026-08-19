@@ -3,10 +3,15 @@ import { JobApplication } from '../types/job';
 
 interface ApplicationTableProps {
   jobs: JobApplication[];
-  onDeleteJob : (id: string) => void;
+  onDeleteJob: (id: string) => void;
+  onEditJob: (job: JobApplication) => void;
 }
 
-export const ApplicationTable: React.FC<ApplicationTableProps> = ({ jobs, onDeleteJob, }) => {
+export const ApplicationTable: React.FC<ApplicationTableProps> = ({
+  jobs,
+  onDeleteJob,
+  onEditJob,
+}) => {
   const getStatusBadge = (status: JobApplication['status']) => {
     const styles = {
       Applied: 'bg-blue-100 text-blue-800',
@@ -26,7 +31,7 @@ export const ApplicationTable: React.FC<ApplicationTableProps> = ({ jobs, onDele
             <th className="p-4">Role</th>
             <th className="p-4">Date Applied</th>
             <th className="p-4">Status</th>
-            <th className="p-4">Actions</th>
+            <th className="p-4 text-right">Actions</th>
           </tr>
         </thead>
         <tbody className="divide-y text-sm">
@@ -63,7 +68,13 @@ export const ApplicationTable: React.FC<ApplicationTableProps> = ({ jobs, onDele
                     {job.status}
                   </span>
                 </td>
-                <td className="p-4 text-right space-x-2">
+                <td className="p-4 text-right space-x-3">
+                  <button
+                    onClick={() => onEditJob(job)}
+                    className="text-blue-600 hover:text-blue-800 text-xs font-medium"
+                  >
+                    Edit
+                  </button>
                   <button
                     onClick={() => onDeleteJob(job.id)}
                     className="text-red-600 hover:text-red-800 text-xs font-medium"

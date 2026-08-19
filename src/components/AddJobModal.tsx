@@ -1,16 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { JobApplication, ApplicationStatus } from '../types/job';
 
 interface AddJobModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onAddJob: (job: Omit<JobApplication, 'id'>) => void;
+  onSaveJob: (job: Omit<JobApplication, 'id'>) => void;
+  initialData?: JobApplication | null;
 }
 
 export const AddJobModal: React.FC<AddJobModalProps> = ({
   isOpen,
   onClose,
-  onAddJob,
+  onSaveJob,
+  initialData,
 }) => {
   const [company, setCompany] = useState('');
   const [role, setRole] = useState('');
@@ -19,13 +21,31 @@ export const AddJobModal: React.FC<AddJobModalProps> = ({
   const [jobUrl, setJobUrl] = useState('');
   const [notes, setNotes] = useState('');
 
+  useEffect(() => {
+    if (initialData) {
+      setCompany(initialData.company);
+      setRole(initialData.role);
+      setDateApplied(initialData.dateApplied);
+      setStatus(initialData.status);
+      setJobUrl(initialData.jobUrl || '');
+      setNotes(initialData.notes || '');
+    } else {
+      setCompany('');
+      setRole('');
+      setDateApplied('');
+      setStatus('Applied');
+      setJobUrl('');
+      setNotes('');
+    }
+  }, [initialData, isOpen]);
+
   if (!isOpen) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!company || !role || !dateApplied) return;
 
-    onAddJob({
+    onSaveJob({
       company,
       role,
       dateApplied,
@@ -34,28 +54,21 @@ export const AddJobModal: React.FC<AddJobModalProps> = ({
       notes,
     });
 
-    // Reset Form
-    setCompany('');
-    setRole('');
-    setDateApplied('');
-    setStatus('Applied');
-    setJobUrl('');
-    setNotes('');
     onClose();
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6 relative space-y-4">
-        {/* Header */}
         <div className="flex justify-between items-center border-b pb-3">
-          <h3 className="text-lg font-semibold text-gray-800">Add New Application</h3>
+          <h3 className="text-lg font-semibold text-gray-800">
+            {initialData ? 'Edit Application' : 'Add New Application'}
+          </h3>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 font-bold">
             ✕
           </button>
         </div>
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-xs font-semibold text-gray-600 uppercase mb-1">
@@ -67,7 +80,6 @@ export const AddJobModal: React.FC<AddJobModalProps> = ({
               value={company}
               onChange={(e) => setCompany(e.target.value)}
               className="w-full px-3 py-2 border rounded-md text-sm outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="e.g. Google"
             />
           </div>
 
@@ -81,7 +93,6 @@ export const AddJobModal: React.FC<AddJobModalProps> = ({
               value={role}
               onChange={(e) => setRole(e.target.value)}
               className="w-full px-3 py-2 border rounded-md text-sm outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="e.g. Frontend Engineer"
             />
           </div>
 
@@ -125,7 +136,6 @@ export const AddJobModal: React.FC<AddJobModalProps> = ({
               value={jobUrl}
               onChange={(e) => setJobUrl(e.target.value)}
               className="w-full px-3 py-2 border rounded-md text-sm outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="https://..."
             />
           </div>
 
@@ -138,11 +148,9 @@ export const AddJobModal: React.FC<AddJobModalProps> = ({
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               className="w-full px-3 py-2 border rounded-md text-sm outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Next steps, referral contact..."
             />
           </div>
 
-          {/* Action Buttons */}
           <div className="flex justify-end gap-3 pt-3 border-t">
             <button
               type="button"
@@ -155,7 +163,7 @@ export const AddJobModal: React.FC<AddJobModalProps> = ({
               type="submit"
               className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700"
             >
-              Save Application
+              {initialData ? 'Update Application' : 'Save Application'}
             </button>
           </div>
         </form>
